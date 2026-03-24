@@ -1,0 +1,16 @@
+{
+  "name": "kpcc-card-api",
+  "version": "1.0.0",
+  "description": "API to generate KPCC membership card images using Satori",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "satori": "^0.10.11",
+    "@resvg/resvg-js": "^2.6.0"
+  }
+}
