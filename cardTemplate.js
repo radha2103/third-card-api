@@ -18,6 +18,7 @@
  * @param {string|null} data.bgBase64
  * @returns {Object} Satori-compatible React-element tree
  */
+
 export function buildCardElement({
   name = "",
   membershipId = "",

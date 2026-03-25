@@ -1,3 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
+
+import { v2 as cloudinary } from "cloudinary";
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 import express from "express";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
@@ -186,9 +195,18 @@ app.post("/generate-card", async (req, res) => {
     const pngData = resvg.render();
     const pngBuffer = pngData.asPng();
 
-    res.setHeader("Content-Type", "image/png");
-    res.setHeader("Content-Disposition", `inline; filename="kpcc-card.png"`);
-    res.send(pngBuffer);
+    // Upload to Cloudinary and return URL
+const imageUrl = await new Promise((resolve, reject) => {
+  cloudinary.uploader.upload_stream(
+    { folder: "kpcc-cards" },
+    (error, result) => {
+      if (error) return reject(error);
+      resolve(result.secure_url);
+    }
+  ).end(pngBuffer);
+});
+
+res.json({ url: imageUrl });
   } catch (err) {
     console.error("Card generation error:", err);
     res.status(500).json({ error: err.message });
