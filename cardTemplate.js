@@ -2,14 +2,10 @@
  * Builds the KPCC membership card JSX object for Satori.
  * Satori requires inline styles only — no CSS classes.
  *
- * The background image already contains:
- *   - Logo + "KARANATAKA PRADESH CONGRESS COMMITTEE" header
- *   - Address line
- *   - "Signature" label at bottom-right
- *   - Tricolor watercolor design
- *
- * So this function ONLY renders the photo box and the field rows
- * positioned on top of the background image.
+ * This variant:
+ *  - No photo box
+ *  - Fields shown with dotted lines (label: ............)
+ *  - Full width fields
  *
  * @param {Object} data
  * @param {string} data.name
@@ -18,9 +14,8 @@
  * @param {string} data.phoneNumber
  * @param {string} data.acNo
  * @param {string} data.constituency
- * @param {string|null} data.photoBase64  – full data-URI, e.g. "data:image/jpeg;base64,..."
  * @param {string|null} data.signatureBase64
- * @param {string|null} data.bgBase64     – full data-URI of the background image
+ * @param {string|null} data.bgBase64
  * @returns {Object} Satori-compatible React-element tree
  */
 export function buildCardElement({
@@ -30,14 +25,14 @@ export function buildCardElement({
   phoneNumber = "",
   acNo = "",
   constituency = "",
-  photoBase64 = null,
   signatureBase64 = null,
   bgBase64 = null,
 }) {
   const CARD_W = 600;
   const CARD_H = 375;
+  const DOTS = " ....................................................";
 
-  // ── reusable field row ───────────────────────────────────────────────────
+  // ── reusable field row with dotted line ──────────────────────────────────
   const Field = (label, value) => ({
     type: "div",
     props: {
@@ -45,7 +40,7 @@ export function buildCardElement({
         display: "flex",
         flexDirection: "row",
         alignItems: "baseline",
-        marginBottom: 7,
+        marginBottom: 10,
       },
       children: [
         {
@@ -55,8 +50,9 @@ export function buildCardElement({
               fontWeight: 700,
               fontSize: 13,
               color: "#111",
-              width: 126,
               flexShrink: 0,
+              marginRight: 4,
+              marginLeft: 49,
             },
             children: label + ":",
           },
@@ -68,59 +64,27 @@ export function buildCardElement({
               fontSize: 13,
               color: "#222",
               fontWeight: 500,
+              flex: 1,
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              
             },
-            children: value || "",
+            // If value provided, show it; otherwise show dots
+            children: value ? " " + value  : DOTS,
           },
         },
       ],
     },
   });
 
-  // ── photo box ────────────────────────────────────────────────────────────
-  const PhotoBox = {
-    type: "div",
-    props: {
-      style: {
-        width: 110,
-        height: 140,
-        border: "2px solid #555",
-        borderRadius: 4,
-        background: "#000",          // solid black when no photo
-        marginRight: 22,
-        flexShrink: 0,
-        overflow: "hidden",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      },
-      children: photoBase64
-        ? {
-            type: "img",
-            props: {
-              src: photoBase64,
-              width: 110,
-              height: 140,
-              style: { objectFit: "cover" },
-            },
-          }
-        : {
-            type: "span",
-            props: {
-              style: { color: "#fff", fontSize: 12 },
-              children: "",
-            },
-          },
-    },
-  };
-
-  // ── signature image (sits just above the "Signature" label in the bg) ───
+  // ── signature image ──────────────────────────────────────────────────────
   const SignatureImage = signatureBase64
     ? {
         type: "div",
         props: {
           style: {
             position: "absolute",
-            bottom: 30,           // sit just above the "Signature" text in the bg
+            bottom: 30,
             right: 24,
             display: "flex",
             flexDirection: "column",
@@ -152,7 +116,7 @@ export function buildCardElement({
         flexDirection: "column",
       },
       children: [
-        // ── 1. Background image (full card) ──────────────────────────────
+        // ── 1. Background image ───────────────────────────────────────────
         {
           type: "img",
           props: {
@@ -169,49 +133,32 @@ export function buildCardElement({
           },
         },
 
-        // ── 2. Content overlay (photo + fields only) ─────────────────────
+        // ── 2. Fields overlay ─────────────────────────────────────────────
         {
           type: "div",
           props: {
             style: {
               position: "absolute",
-              // Push below the header area in the background image (~130px tall)
               top: 130,
               left: 0,
               width: CARD_W,
               height: CARD_H - 130,
               display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              padding: "16px 20px 16px 53px",
+              flexDirection: "column",
+              padding: "16px 30px 16px 14px",
             },
             children: [
-              PhotoBox,
-              // ── fields column ────────────────────────────────────────
-              {
-                type: "div",
-                props: {
-                  style: {
-                    display: "flex",
-                    flexDirection: "column",
-                    flex: 1,
-                    paddingTop: 4,
-                  },
-                  children: [
-                    Field("Name", name),
-                    Field("Membership ID", membershipId),
-                    Field("EPIC No", epicNo),
-                    Field("Phone Number", phoneNumber),
-                    Field("AC No", acNo),
-                    Field("Constituency", constituency),
-                  ],
-                },
-              },
+              Field("Name", name),
+              Field("Membership ID", membershipId),
+              Field("EPIC No", epicNo),
+              Field("Phone Number", phoneNumber),
+              Field("AC No", acNo),
+              Field("Constituency", constituency),
             ],
           },
         },
 
-        // ── 3. Optional signature image above the bg "Signature" label ───
+        // ── 3. Optional signature image ───────────────────────────────────
         SignatureImage,
       ],
     },
