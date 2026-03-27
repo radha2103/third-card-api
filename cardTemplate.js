@@ -68,10 +68,8 @@ export function buildCardElement({
               flex: 1,
               overflow: "hidden",
               whiteSpace: "nowrap",
-              
             },
-            // If value provided, show it; otherwise show dots
-            children: value ? " " + value  : DOTS,
+            children: value ? " " + value : DOTS,
           },
         },
       ],
@@ -86,7 +84,7 @@ export function buildCardElement({
           style: {
             position: "absolute",
             bottom: 30,
-            right: 24,
+            right: 60,      // shifted left from 24
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
@@ -95,8 +93,8 @@ export function buildCardElement({
             type: "img",
             props: {
               src: signatureBase64,
-              width: 90,
-              height: 34,
+              width: 120,   // increased from 90
+              height: 45,   // increased from 34
               style: { objectFit: "contain" },
             },
           },
@@ -159,7 +157,7 @@ export function buildCardElement({
           },
         },
 
-        // ── 3. Optional signature image ───────────────────────────────────
+        // ── 3. Signature image ────────────────────────────────────────────
         SignatureImage,
       ],
     },
